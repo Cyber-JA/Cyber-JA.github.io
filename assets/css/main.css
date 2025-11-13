@@ -1694,5 +1694,5 @@ input, select, textarea {
 }
 
 html {
-    overflow-y: overlay; /* Scrollbar overlays the content */
+    overflow-y: scroll; /* Reserve space for the scrollbar */
 }
