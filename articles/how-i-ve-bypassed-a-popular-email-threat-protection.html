@@ -11,10 +11,10 @@
             <div id="wrapper">
                 <article>
                     <h1 class="el-rev fade-in" lang="en" >How I bypassed a Popular Email Threat Protection Solution</h1>
+                    <blockquote>During a recent penetration test, we collaborated with a company that was using a popular AI-based Email Protection software, hereinafter referred to as the <em>ACME</em> software. At first glance, the solution seemed robust and comprehensive, with multiple layers of filtering designed to block most phishing attempts. However, by crafting a phishing campaign tailored to the company’s specific context, we were able to uncover several weaknesses. The attack combined different techniques: spoofing the sender of a trusted partner, registering a newly deceptive domain, and embedding the malicious email within an existing thread to enhance credibility. As a direct consequence, the <em>ACME Corporation</em> released a dedicated pattern to detect this type of phishing attempt.</blockquote>
                         <div class="content-wrapper">
                         
                             <div class="main-content">    
-                                <blockquote>During a recent penetration test, we collaborated with a company that was using a popular AI-based Email Protection software, hereinafter referred to as the <em>ACME</em> software. At first glance, the solution seemed robust and comprehensive, with multiple layers of filtering designed to block most phishing attempts. However, by crafting a phishing campaign tailored to the company’s specific context, we were able to uncover several weaknesses. The attack combined different techniques: spoofing the sender of a trusted partner, registering a newly deceptive domain, and embedding the malicious email within an existing thread to enhance credibility. As a direct consequence, the <em>ACME Corporation</em> released a dedicated pattern to detect this type of phishing attempt.</blockquote>
                                 <h2 id="phishing-definition-and-types">Phishing definition and types</h2>
                             
                                 <p><strong>Phishing</strong> is a social engineering technique where attackers deceive recipients into revealing sensitive information, downloading malware, or carrying out harmful actions. They achieve this by crafting fraudulent messages that appear legitimate, often by impersonating a colleague, partner, or well-known brand.</p>
@@ -192,9 +192,6 @@
                                 <p>This outcome revealed a clear detection gap: the system did not generate any alerts or provide administrators with any evidence of the attack, making it impossible to identify the incident through standard monitoring. Following the report of these findings, the&nbsp;<em>ACME Corporation </em>addressed the issue by releasing a dedicated AS Pattern, designed to detect and block this specific type of phishing email in future scenarios.</p>
                                 <p>While this enhancement strengthened the platform’s detection capabilities, the test ultimately underscored that no technical control, however sophisticated, can completely eliminate risk. Effective protection against phishing requires not only robust security technologies but also well-trained employees who are aware of threats and prepared to identify and report suspicious activity.</p>
 
-                                <h2 id="the-importance-of-awareness">The importance of Awareness</h2>
-                                <p>Advanced phishing prevention solutions can filter vast amounts of malicious traffic, but phishing is not merely a technical issue: it is a <strong>psychological one</strong>, crafted to exploit trust, routine, and human error.<br aria-hidden="true">
-                                    <p>Awareness is not about blaming users; it is about <strong>empowering them</strong>. By promoting a culture in which feeling comfortable questioning suspicious messages and escalating concerns promptly, so that organizations gain an active line of defense that no automated system can replace.</p>
                             </div>
                             <nav id="toc" class="toc" aria-label="Table of contents">
                                 <span>Table of contents</span>
@@ -247,20 +244,16 @@
                                             <li class="toc-item"><a href="#4.-domain-spoofing">4. Domain Spoofing</a></li>
                                         </ul>
                                     </li>
-                                    <li>
-                                        <ul class="toc-sublist">
-                                            <li class="toc-item"><a href="#final-results-and-thoughts">Final Results and Thoughts</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="toc-item"><a href="#the-importance-of-awareness">The importance of Awareness</a></li>
+                                    <li class="toc-item"><a href="#final-results-and-thoughts">Final Results and Thoughts</a></li>
+                                    
                                 </ul>
                             </nav>
+                            
+                            
                         </div>
+                        <div><a href="http://127.0.0.1:8000/#blog" class="button">Back</a></div>
                         </div>
                     </article>
-                <div class="footer">
-                    <h2>Footer</h2>
-                    </div>
             </div>
 
         <!-- BG -->
@@ -294,6 +287,8 @@
             border-radius: 5px; /* Optional: rounded corners */
             max-height: 90vh; /* Limit the height to 90% of the viewport */
             overflow-y: auto; /* Add scroll if content overflows */
+            position: sticky ; /* Make it sticky */
+            top: 30px; /* Distance from the top when sticky */
         }
     
         .toc ul {
@@ -336,6 +331,15 @@
 
         .toc {
             font-size: 15px; /* Optional: Make the ToC font slightly smaller */
+        }
+        
+        /* Center text and add spacing for the entire page */
+        body {
+            margin: 0 auto; /* Center the body horizontally */
+            padding: 0 ; /* Add 30px space on the left and right */
+            max-width: 1200px; /* Optional: Limit the width for better readability */
+            text-align: justify; /* Optional: Justify text for a cleaner look */
+            box-sizing: border-box; /* Ensure padding is included in the width */
         }
     </style>
 </html>

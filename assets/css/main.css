@@ -95,7 +95,9 @@ input, select, textarea {
 	}
 
 	body {
-		background: #1b1f22;
+		background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+					url('/images/background.jpg') no-repeat center center fixed;
+		background-size: cover;
 	}
 
 		body.is-preload *, body.is-preload *:before, body.is-preload *:after {
@@ -1105,7 +1107,7 @@ input, select, textarea {
 	}
 
 /* BG */
-
+/*
 	#bg {
 		-moz-transform: scale(1.0);
 		-webkit-transform: scale(1.0);
@@ -1140,9 +1142,12 @@ input, select, textarea {
 			-ms-transition-delay: 0.75s;
 			transition-delay: 0.75s;
 			background-image: linear-gradient(to top, rgba(19, 21, 25, 0.5), rgba(19, 21, 25, 0.5)), url("../../images/overlay.png");
-			background-size: auto, 256px 256px;
-			background-position: center, center;
-			background-repeat: no-repeat, repeat;
+			background-size: auto,
+ 256px 256px;
+			background-position: center,
+ center;
+			background-repeat: no-repeat,
+ repeat;
 			z-index: 2;
 		}
 
@@ -1176,7 +1181,13 @@ input, select, textarea {
 		body.is-preload #bg:before {
 			background-color: #000000;
 		}
-
+*/
+#bg {
+    background: none;
+}
+#bg {
+    filter: blur(0.1rem); /* Reduce the blur intensity */
+}
 /* Wrapper */
 
 	#wrapper {
@@ -1656,3 +1667,36 @@ input, select, textarea {
 		body.is-preload #footer {
 			opacity: 0;
 		}
+
+
+/* Style for the sticky button */
+.sticky-button {
+    position: sticky; /* Make it sticky */
+    top: 100px; /* Adjust the distance from the top */
+    margin-left: 20px; /* Align it with the ToC */
+    text-align: center; /* Center the button inside the div */
+}
+
+.sticky-button .button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF; /* Blue background */
+    color: #fff; /* White text */
+    text-decoration: none; /* Remove underline */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px;
+    text-align: center;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.sticky-button .button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+html {
+    overflow-y: scroll; /* Reserve space for the scrollbar */
+}
+
+body::-webkit-scrollbar {
+    display: none; /* Hide the scrollbar (for WebKit browsers like Chrome and Safari) */
+}
