@@ -1694,9 +1694,5 @@ input, select, textarea {
 }
 
 html {
-    overflow-y: scroll; /* Reserve space for the scrollbar */
-}
-
-body::-webkit-scrollbar {
-    display: none; /* Hide the scrollbar (for WebKit browsers like Chrome and Safari) */
+    overflow-y: overlay; /* Scrollbar overlays the content */
 }
