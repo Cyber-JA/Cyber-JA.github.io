@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>How I Have Bypassed a Popular Email Threat Protection Solution.</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+            <div id="wrapper">
+                <article>
+                    <h1 class="el-rev fade-in" lang="en" >Real-World ESC8 + RBCD Abuse in Active Directory.</h1>
+                    <blockquote>During a recent internal security assessment, we engaged with an organization operating a well-structured Microsoft Active Directory environment. At first glance, the domain appeared hardened and aligned with common industry practices: privileged accounts were well monitored, auditing was enabled, and the number of Domain Admin users was properly contained. However, by analyzing the configuration of the Kerberos delegation paths, we identified an overlooked but critical exposure — an ESC8-equivalent attack path via Resource-Based Constrained Delegation (RBCD).
+                        By carefully chaining together misconfigurations, we were able to demonstrate a full privilege escalation starting from a low-privileged domain account. Through the creation of a controlled machine account, followed by the manipulation of the msDS-AllowedToActOnBehalfOfOtherIdentity attribute on a target server, we successfully established a situation where Kerberos tickets could be requested and impersonation rights escalated. Once this delegation path was in place, we leveraged RBCD to operate under the identity of a highly privileged service account, demonstrating the potential for complete domain compromise.</blockquote>
+                        <div class="content-wrapper">
+                        
+                            <div class="main-content">    
+                                <h2 id="technical-background">Technical BackGround</h2>
+
+                                    <h3 id="ESC8">ESC Vulnerabilities in Active Directory</h3>
+                            
+                                        <p><strong>ESC (Enterprise Security Control) vulnerabilities</strong> refer to a family of misconfigurations in Active Directory Certificate Services (AD CS) that allow attackers to abuse weak certificate templates, enrollment permissions, or trust relationships to obtain authentication certificates and impersonate privileged accounts.
+                                            Because AD CS integrates directly with Kerberos and NTLM authentication, a single exploitable ESC pathway can let a low-privileged user request a certificate that grants elevated rights — often including domain admin privileges. ESC issues are particularly dangerous because they can be exploited remotely, silently, and with no brute-force activity or malware execution, making detection difficult.</p>
+                                        <p>The most common type of exploited ESC vulnerability is the ESC8.</p>
+                                        <p> <strong>ESC8</strong> arises when a certificate template allows authentication but is assigned to a security principal that supports automatic enrollment, such as a computer object. If an attacker is able to create a new computer account (or compromise one), they can request a certificate based on the vulnerable template.
+                                            The resulting certificate can then be used to authenticate as the machine account and, depending on environment configuration, pivot through Kerberos or delegation mechanisms to escalate privileges.</p>
+                                        </p>
+                                    <h3 id="RBCD">Resource-Based Constrained Delegation (RBCD)</h3>
+                                        <p><strong>Resource-Based Constrained Delegation (RBCD)</strong> is a feature in Active Directory that allows administrators to specify which services can delegate user credentials to other services on behalf of users. Unlike traditional constrained delegation, which is configured on the service account, RBCD is configured on the resource (target) service account. This means that the target service can specify which accounts are allowed to delegate to it.</p>
+                                        <p>RBCD is often used in scenarios where services need to access resources on behalf of users, such as web applications accessing databases. However, if misconfigured, RBCD can be exploited by attackers to impersonate privileged accounts and gain unauthorized access to sensitive resources.</p>
+                                        <p>The delegation is controlled by the <i>msDS-AllowedToActOnBehalfOfOtherIdentity </i> attribute, which defines which accounts can impersonate others. When correctly configured, RBCD enables granular authentication routing in complex service architectures</p>          
+                                <h2>Attack Conditions</h2>
+                                        <p>Before an ESC8 attack path becomes exploitable, specific preconditions must be present within the Active Directory Certificate Services configuration. Most importantly, Web Enrollment must be enabled, as it provides an accessible enrollment endpoint that can be reached by low-privileged users to request certificates. In addition, Extended Protection for Authentication (EPA) must be disabled or set to false, as this weakens the authentication validation process and removes a critical layer of protection against unauthorized certificate requests. When these two conditions coexist, an attacker with the ability to create or compromise a machine account can request a certificate via the web interface and subsequently leverage it to authenticate with elevated privileges, thus enabling the full exploitation chain associated with ESC8.</p>
+
+                                        <p>Detection of ESC8 can be performed using the Certify tool, which enumerates certificate templates, enrollment policies, and identifies configurations susceptible to ADCS exploitation — including ESC8 conditions. The following command permits to enumerate, using unprivileged account, exploitable templates, along with the reasons determining such template as vulnerable for further investigation.</p>
+                                        
+                                    <pre><code>certipy-ad find -u  "username" -p "password" -dc-ip "domainControllerIP" -target-ip -vulnerable -enable -stdout</code></pre>
+                                    </div>
+                            <nav id="toc" class="toc" aria-label="Table of contents">
+                                <span>Table of contents</span>
+                                <ul id="tocList" class="sidenav">
+                                    <li class="toc-item"><a href="#technical-background">Technical BackGround</a>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#ESC8">ESC8 Overview</a></li>
+                                        </ul>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#RBCD">RBCD Overview</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="toc-item"><a href="#how-phishing-prevention-systems-work">How Phishing Prevention Systems work</a></li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#the-acme-case-study">The <i>ACME </i>case study</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#how-as-patterns-are-generated">How AS Patterns are generated</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#limits-of-pattern-based-detection">Limits of Pattern-Based Detection</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#how-the-protection-was-bypassed">How the protection was bypassed</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="toc-item"><a href="#detailed-analysis-of-the-bypass-factors">Detailed analysis of the bypass factors</a></li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#0.-preliminary-information-gathering">0. Preliminary Information Gathering</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item current"><a href="#1.-thread-hijacking-technique">1. Thread Hijacking Technique</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#2.-contextual-tailoring">2. Contextual Tailoring</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#3.-sender-spoofing">3. Sender Spoofing</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="toc-sublist">
+                                            <li class="toc-item"><a href="#4.-domain-spoofing">4. Domain Spoofing</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="toc-item"><a href="#final-results-and-thoughts">Final Results and Thoughts</a></li>
+                                    
+                                </ul>
+                            </nav>
+                            
+                            
+                        </div>
+                        <div><a href="https://cyber-ja.github.io/#blog" class="button">Back</a></div>
+                        </div>
+                    </article>
+            </div>
+
+        <!-- BG -->
+            <div id="bg"></div>
+
+        <!-- Scripts -->
+        <script src="/assets/js/jquery.min.js"></script>
+        <script src="/assets/js/browser.min.js"></script>
+        <script src="/assets/js/breakpoints.min.js"></script>
+        <script src="/assets/js/util.js"></script>
+        <script src="/assets/js/main.js"></script>
+    </body>
+    <style>
+        .content-wrapper {
+            display: flex; /* Use flexbox for side-by-side layout */
+            flex-wrap: nowrap; /* Prevent wrapping of children */
+            align-items: flex-start; /* Align items at the top */
+        }
+    
+        .main-content {
+            flex: 1; /* Take up remaining space */
+            min-width: 70%; /* Ensure it doesn't shrink too much */
+        }
+    
+        .toc {
+            flex: 0 0 25%; /* Fixed width for the ToC */
+            margin-left: 20px; /* Add some spacing */
+            background-color: rgba(51, 51, 51, 0.6); /* More transparent dark background */
+            color: #fff; /* White text for contrast */
+            padding: 15px; /* Add padding inside the ToC */
+            border-radius: 5px; /* Optional: rounded corners */
+            max-height: 90vh; /* Limit the height to 90% of the viewport */
+            overflow-y: auto; /* Add scroll if content overflows */
+            position: sticky ; /* Make it sticky */
+            top: 30px; /* Distance from the top when sticky */
+        }
+    
+        .toc ul {
+            list-style-type: none; /* Remove bullets for top-level items */
+            padding-left: 0; /* Remove indentation */
+            margin: 0; /* Remove spacing between items */
+        }
+    
+        .toc ul ul {
+            list-style-type: none; /* Remove bullets for nested lists */
+            padding-left: 15px; /* Add slight indentation for nested items */
+            margin: 0; /* Remove spacing between nested items */
+        }
+    
+        .toc a {
+            color: #fff; /* Ensure links are white for readability */
+            text-decoration: none; /* Remove underline from links */
+        }
+    
+        .toc a:hover {
+            text-decoration: underline; /* Add underline on hover for clarity */
+        }
+    
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column; /* Stack on smaller screens */
+            }
+    
+            .toc {
+                margin-left: 0;
+                margin-top: 20px; /* Add spacing above ToC */
+                max-height: none; /* Remove height restriction on smaller screens */
+            }
+        }
+       
+        body {
+        font-size: 18px; /* Adjust this value to make the font smaller */
+        line-height: 1.6; /* Maintain good readability with proper line height */
+        }
+
+        .toc {
+            font-size: 15px; /* Optional: Make the ToC font slightly smaller */
+        }
+        
+        /* Center text and add spacing for the entire page */
+        body {
+            margin: 0 auto; /* Center the body horizontally */
+            padding: 0 ; /* Add 30px space on the left and right */
+            max-width: 1200px; /* Optional: Limit the width for better readability */
+            text-align: justify; /* Optional: Justify text for a cleaner look */
+            box-sizing: border-box; /* Ensure padding is included in the width */
+        }
+    </style>
+</html>
