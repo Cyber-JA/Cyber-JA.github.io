@@ -30,12 +30,19 @@
                                         <p><strong>Resource-Based Constrained Delegation (RBCD)</strong> is a feature in Active Directory that allows administrators to specify which services can delegate user credentials to other services on behalf of users. Unlike traditional constrained delegation, which is configured on the service account, RBCD is configured on the resource (target) service account. This means that the target service can specify which accounts are allowed to delegate to it.</p>
                                         <p>RBCD is often used in scenarios where services need to access resources on behalf of users, such as web applications accessing databases. However, if misconfigured, RBCD can be exploited by attackers to impersonate privileged accounts and gain unauthorized access to sensitive resources.</p>
                                         <p>The delegation is controlled by the <i>msDS-AllowedToActOnBehalfOfOtherIdentity </i> attribute, which defines which accounts can impersonate others. When correctly configured, RBCD enables granular authentication routing in complex service architectures</p>          
-                                <h2>Attack Conditions</h2>
-                                        <p>Before an ESC8 attack path becomes exploitable, specific preconditions must be present within the Active Directory Certificate Services configuration. Most importantly, Web Enrollment must be enabled, as it provides an accessible enrollment endpoint that can be reached by low-privileged users to request certificates. In addition, Extended Protection for Authentication (EPA) must be disabled or set to false, as this weakens the authentication validation process and removes a critical layer of protection against unauthorized certificate requests. When these two conditions coexist, an attacker with the ability to create or compromise a machine account can request a certificate via the web interface and subsequently leverage it to authenticate with elevated privileges, thus enabling the full exploitation chain associated with ESC8.</p>
+                                <h2 id="attack-conditions">Attack Preconditions</h2>
+                                        <p>Before this attack path becomes exploitable, specific preconditions must be present within the Active Directory Certificate Services configuration. Most importantly, Web Enrollment must be enabled, as it provides an accessible enrollment endpoint that can be reached by low-privileged users to request certificates. In addition, Extended Protection for Authentication (EPA) must be disabled or set to false, as this weakens the authentication validation process and removes a critical layer of protection against unauthorized certificate requests. When these two conditions coexist, an attacker with the ability to create or compromise a machine account can request a certificate via the web interface and subsequently leverage it to authenticate with elevated privileges, thus enabling the full exploitation chain associated with ESC8.</p>
 
-                                        <p>Detection of ESC8 can be performed using the Certify tool, which enumerates certificate templates, enrollment policies, and identifies configurations susceptible to ADCS exploitation — including ESC8 conditions. The following command permits to enumerate, using unprivileged account, exploitable templates, along with the reasons determining such template as vulnerable for further investigation.</p>
+                                        <p>Detection of ESC8 can be performed using the Certify/Certipy tool, which enumerates certificate templates, enrollment policies, and identifies configurations susceptible to ADCS exploitation — including ESC8 conditions. The following command permits to enumerate, using unprivileged account, exploitable templates, along with the reasons determining such template as vulnerable for further investigation.</p>
                                         
                                     <pre><code>certipy-ad find -u  "username" -p "password" -dc-ip "domainControllerIP" -vulnerable -enable -stdout</code></pre>
+
+                                    <p>The output of the tool indicated below has been redacted for privacy reasons. As underlined, the tool allows to detect those necessary preconditions that may enable a viable attack path.</p>
+
+                                    <img src="/images/Certipy-Output.png" alt="Certipy Output" />
+
+                                    <img src="/images/certipy-output-2.png" alt="Certipy Output" />
+                                    
                                     </div>
                             <nav id="toc" class="toc" aria-label="Table of contents">
                                 <span>Table of contents</span>
@@ -48,7 +55,7 @@
                                             <li class="toc-item"><a href="#RBCD">RBCD Overview</a></li>
                                         </ul>
                                     </li>
-                                    <li class="toc-item"><a href="#how-phishing-prevention-systems-work">How Phishing Prevention Systems work</a></li>
+                                    <li class="toc-item"><a href="#attack-conditions">Attack Preconditions</a></li>
                                     <li>
                                         <ul class="toc-sublist">
                                             <li class="toc-item"><a href="#the-acme-case-study">The <i>ACME </i>case study</a></li>
